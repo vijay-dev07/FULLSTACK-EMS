@@ -1,5 +1,7 @@
 import { FileText, Loader2, Send, X } from 'lucide-react';
 import React, { useState } from 'react'
+import api from '../../api/axios';
+import toast from 'react-hot-toast';
 
 const ApplyLeaveModal = ({open , onClose , onSuccess}) => {
     const [loading , setLoading ] =useState(false);
@@ -11,6 +13,17 @@ const ApplyLeaveModal = ({open , onClose , onSuccess}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true)
+        const formData = new FormData(e.currentTarget)
+        const data = Object.fromEntries(formData.entries())
+
+        try {
+            await api.post('/leave' ,data)
+            onSuccess();
+            onClose();
+        } catch (error) {
+            toast.error(error.response?.data?.error || error?.message )
+        }
     }
 
     if(!open) return null
@@ -78,7 +91,7 @@ const ApplyLeaveModal = ({open , onClose , onSuccess}) => {
                     <button onClick={onClose} type='button' className='btn-secondary flex-1'>
                         Cancel
                     </button>
-                    <button onClick={onClose} disabled={loading} type='submit' className='btn-primary flex-1 flex
+                    <button  disabled={loading} type='submit' className='btn-primary flex-1 flex
                      items-center justify-center gap-2'>
                         {loading ? <Loader2 className='w-4 h-4 animate-spin'/> : <Send className='w-4 h-4'/>}
                         {loading ? "Submitting..." : "Submit"}
