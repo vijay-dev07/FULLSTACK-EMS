@@ -46,7 +46,7 @@ export const updateProfile = async (req , res) => {
          await Employee.findByIdAndUpdate(employee._id , {
             bio:req.body.bio
          })
-         return res.status(500).json({ success: true});
+         return res.status(200).json({ success: true});
     } catch (error) {
         return res.status(500).json({error:"Failed to update profile"})
         

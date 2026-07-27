@@ -1,11 +1,11 @@
+import { inngest } from "../inngest/index.js";
+import Attendance from "../models/Attendance.js";
+import Employee from "../models/Employee.js";
 
 
 // Clock in/out for employee
 // POST /api/attendence
 
-import { inngest } from "../inngest/index.js";
-import Attendance from "../models/Attendance.js";
-import Employee from "../models/Employee.js";
 
 export const clockInOut = async (req , res) => {
     try {
@@ -20,14 +20,16 @@ export const clockInOut = async (req , res) => {
         const today = new Date();
         today.setHours(0,0,0,0);
 
-        const existing = await Attendance.findById({
+        const existing = await Attendance.findOne({
             employeeId: employee._id,
             date: today,
         })
 
+        console.log(existing);
+
         const now = new Date();
 
-        if(existing){
+        if(!existing){
             const isLate = now.getHours() >= 9 && now.getMinutes() > 0;
             const attendance = await Attendance.create({
                 employeeId: employee._id,

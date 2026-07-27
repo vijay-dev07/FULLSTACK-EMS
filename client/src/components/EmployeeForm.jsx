@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom"
 import { DEPARTMENTS } from "../assets/assets";
 import { Loader2Icon } from "lucide-react";
+import api from "../api/axios";
+import toast from "react-hot-toast"
+
 
 const EmployeeForm = ({ initialData , onSuccess  , onCancel}) => {
 
@@ -10,6 +13,24 @@ const EmployeeForm = ({ initialData , onSuccess  , onCancel}) => {
     const isEditMode = !!initialData;
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setLoading(true)
+        const formData = new FormData(e.currentTarget);
+        if(isEditMode){
+            const pwd = formData.get("password")
+            if(!pwd) formData.delete("password")
+        }
+        try {
+
+            const url = isEditMode ? `/employees/${initialData.id}` : "/employees";
+            const method = isEditMode ? "put" : "post";
+            await api[method](url , formData)
+            onSuccess ? onSuccess() :navigate("/employees")
+            
+        } catch (error) {
+            toast.error(error.response?.data?.error || error.message);
+        }finally{
+            setLoading(false);
+        }
     }
 
   return (
@@ -22,24 +43,23 @@ const EmployeeForm = ({ initialData , onSuccess  , onCancel}) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm text-slate-700">
                 <div>
                     <label className="block mb-2 "> First Name</label>
-                    <input name="firstName " required defaultValue={initialData?.firstName}/>
+                    <input name="firstName" required defaultValue={initialData?.firstName}/>
                 </div>
                 <div>
                     <label className="block mb-2 "> Last Name</label>
-                    <input name="lastName " required defaultValue={initialData?.lastName}/>
+                    <input name="lastName" required defaultValue={initialData?.lastName}/>
                 </div>
                 <div>
                     <label className="block mb-2 "> Phone</label>
-                    <input name="phone " required defaultValue={initialData?.phone}/>
+                    <input name="phone" required defaultValue={initialData?.phone}/>
                 </div>
                  <div>
                     <label className="block mb-2 "> Join Date</label>
-                    <input name="joinDate " required defaultValue={initialData?.joinDate ? new Date
-                     (initialData.joinDate).toISOString().split("T")[0] : ""}/>
+                    <input name="joinDate "type="date" />
                 </div>
                 <div className="sm:col-span-2">
                     <label className="block mb-2 "> Bio (Optional)</label>
-                    <textarea name="bio "  defaultValue={initialData?.bio} rows={3} className="resize-none"
+                    <textarea name="bio"  defaultValue={initialData?.bio} rows={3} className="resize-none"
                     placeholder="Brief description..."/>
                 </div>
 
@@ -97,18 +117,18 @@ const EmployeeForm = ({ initialData , onSuccess  , onCancel}) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm text-slate-700">
                 <div className="sm:col-span-2">
                     <label className="block mb-2 "> Work Email</label>
-                    <input type="email" name="email " required defaultValue={initialData?.email}/>
+                    <input type="email" name="email" required defaultValue={initialData?.email}/>
                 </div>
                 {!isEditMode && (
                      <div >
                         <label className="block mb-2 ">Temporary Password</label>
-                        <input type="password" name="password " required />
+                        <input type="password" name="password" required />
                     </div>
                 )}
                 {isEditMode && (
                      <div >
                         <label className="block mb-2 ">Change Password (Optional)</label>
-                        <input type="password" name="password " placeholder="Leave blank to keep current" />
+                        <input type="password" name="password" placeholder="Leave blank to keep current" />
                     </div>
                 )}
 
