@@ -6,22 +6,23 @@ import User from "../models/User.js";
 // Get /api/employess
 
 
-export const  getEmployess = async (req , res ) => {
+export const  getEmployees = async (req , res ) => {
     try {
 
-        const {departement} = async (req , res) =>{
+        const {department} = req.query;
             const where = {};
-            if(departement)where.departement = departement;
-            const employees = (await Employee.find(where)).toSorted({createdAt:-1}).populate("userId" , "email role").lean();
+            if(department) where.department = department;
+            const employees = await Employee.find(where).sort({createdAt:-1}).populate("userId" , "email role").lean();
+
+            console.log(employees)
 
             const result = employees.map((emp)=> ({
                 ...emp,
-                id:emp._d.toString(),
+                id:emp._id.toString(),
                 user:emp.userId ? {email: emp.userId.email, role:emp.userId.role} : null
             }))
 
             return res.json(result);
-        }
         
     } catch (error) {
         return res.status(500).json({error: "failed to fetch employees" });
@@ -36,8 +37,9 @@ export const createEmployee = async (req, res)=> {
 
     try {
 
-        const {firstName , lastName , email , phone, position , departement , basicSalary, allowances, 
+        const {firstName , lastName , email , phone, position , department , basicSalary, allowances, 
                deductions , joinDate, password , role , bio  } = req.body;
+
 
         if(!email || !password || !firstName || !lastName){
             return res.status(400).json({error:"Missing Required Fields"});
@@ -57,13 +59,13 @@ export const createEmployee = async (req, res)=> {
             email,
             phone,
             position,
-            departement: departement || "Engineering",
+            department: department || "Engineering",
             basicSalary:Number(basicSalary) || 0,
             allowances:Number(allowances) || 0,
             deductions:Number(deductions) || 0,
-            joinDate:new Date(joinDate),
             bio:bio || "",
         })
+        
 
         return res.status(201).json({success:true, employee})
         

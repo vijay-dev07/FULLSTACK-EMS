@@ -1,12 +1,38 @@
 import { Check, Loader2, Loader2Icon, X } from 'lucide-react';
 import { useState } from 'react'
 import {format} from "date-fns"
+import api from '../../api/axios';
+import toast from 'react-hot-toast';
 
 const LeaveHistory = ({leaves , isAdmin , onUpdate}) => {
     const [processing, setProcessing] = useState(null);
 
     const handleStatusUpdate = async (id , status) => {
         setProcessing(id)
+        try {
+            await api.patch( `/leave/${id}` , {status})
+            onUpdate();
+        } catch (error) {
+
+              console.error("Full Error:", error);
+
+        if (error.response) {
+            // Server responded with an error (4xx/5xx)
+            console.log("Status:", error.response.status);
+            console.log("Response Data:", error.response.data);
+            console.log("Headers:", error.response.headers);
+        } else if (error.request) {
+            // Request was sent but no response received
+            console.log("Request:", error.request);
+        } else {
+            // Error while setting up the request
+            console.log("Message:", error.message);
+        }
+
+            toast.error(error?.response?.error || error?.message)
+        }finally{
+            setProcessing(null)
+        }
     }
 
   return (

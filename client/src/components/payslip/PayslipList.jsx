@@ -3,6 +3,8 @@ import React from 'react'
 import {format} from "date-fns"
 
 const PayslipList = ({payslips , isAdmin}) => {
+
+    // console.log(payslips);
   return (
      <div className='card overflow-hidden '> 
             <div className='overflow-x-auto'>
