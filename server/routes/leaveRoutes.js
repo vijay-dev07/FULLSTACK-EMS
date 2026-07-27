@@ -7,7 +7,11 @@ const leaveRouter = Router();
 
 
 leaveRouter.post("/", protect , createLeave)
-leaveRouter.post("/", protect , getLeaves)
-leaveRouter.post("/", protect , protectAdmin , updateLeaveStatus)
+leaveRouter.get("/", protect , getLeaves)
+// leaveRouter.patch("/:id", protect , protectAdmin , updateLeaveStatus)
+leaveRouter.patch("/:id", (req, res, next) => {
+    console.log("PATCH route reached");
+    next();
+}, protect, protectAdmin, updateLeaveStatus);
 
 export default leaveRouter; 
