@@ -31,7 +31,7 @@ export const createLeave = async (req , res) => {
         }
 
 
-        if(new Date(endDateDate) < new Date(startDate)){
+        if(new Date(endDate) < new Date(startDate)){
             return res.status(400).json({ error:"End date cannot be the start date "});
         }
 
@@ -52,7 +52,10 @@ export const createLeave = async (req , res) => {
 
         return res.json({success: true , data: leave});
     } catch (error) {
-        return res.status(500).json({error: "Failed"});
+         console.error("Create Leave Error:", error);
+        return res.status(500).json({
+            error: error.message,
+        });
         
     }
 }
@@ -107,7 +110,9 @@ export const getLeaves = async (req , res) => {
 export const updateLeaveStatus = async (req , res) => {
 
     try {
+        console.log("status check")
         const { status } = req.body;
+        console.log(req.body);
         if(!["APPROVED" , "REJECTED" , "PENDING"].includes(status)){
             return res.status(400).json({error:"Invalid status"});
         }
